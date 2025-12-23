@@ -1,6 +1,6 @@
 FROM node:20-alpine AS build
 WORKDIR /app
-COPY cicd/package*.json ./
+COPY cicd/package*.json .
 RUN npm install
 COPY . .
 RUN npm run build

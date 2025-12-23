@@ -26,7 +26,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/vite-app:latest
+          tags: ghcr.io/${{ github.repository_owner.toLowerCase() }}/vite-app:latest
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -35,11 +35,11 @@ jobs:
           username: ${{ secrets.ALPINE_USER }}
           key: ${{ secrets.ALPINE_SSH_KEY }}
           script: |
-            docker pull ghcr.io/${{ github.repository_owner }}/vite-app:latest
+            docker pull ghcr.io/${{ github.repository_owner.toLowerCase() }}/vite-app:latest
             docker stop vite-app || true
             docker rm vite-app || true
             docker run -d \
               --name vite-app \
               -p 80:80 \
               --restart unless-stopped \
-              ghcr.io/${{ github.repository_owner }}/vite-app:latest
+              ghcr.io/${{ github.repository_owner.toLowerCase() }}/vite-app:latest

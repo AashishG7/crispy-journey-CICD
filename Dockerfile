@@ -3,11 +3,11 @@ FROM node:22-alpine AS build
 
 WORKDIR /app
 
-COPY package*.json .
+COPY /cicd/package*.json .
 # Use 'npm ci' if you have a lockfile, otherwise 'npm install'
 RUN npm ci 
 
-COPY . .
+COPY /cicd/ .
 
 # DEBUG STEP: This lists files in the logs so we can verify index.html exists
 RUN ls -la

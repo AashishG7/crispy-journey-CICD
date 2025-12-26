@@ -5,7 +5,7 @@ WORKDIR /app
 
 COPY package*.json .
 # Use 'npm ci' if you have a lockfile, otherwise 'npm install'
-RUN npm install 
+RUN npm ci 
 
 COPY . .
 

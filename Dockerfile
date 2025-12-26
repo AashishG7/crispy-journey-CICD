@@ -1,7 +1,7 @@
 # Stage 1: Build the React App
 FROM node:18-alpine as build
 WORKDIR /app
-COPY package*.json ./
+COPY /cicd/package*.json ./
 RUN npm ci
 COPY . .
 RUN npm run build

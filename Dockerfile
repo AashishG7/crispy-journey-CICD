@@ -1,9 +1,9 @@
 # FIX 1: Use Node 22 (required for newer Vite versions)
-FROM node:22-alpine as build
+FROM node:22-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY package*.json .
 # Use 'npm ci' if you have a lockfile, otherwise 'npm install'
 RUN npm install 
 

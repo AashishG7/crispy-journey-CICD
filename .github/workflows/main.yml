@@ -6,8 +6,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  # Image name needs to be lowercase
-  IMAGE_NAME: ${{ github.repository }}
+  # We removed IMAGE_NAME from here because we will define it dynamically below
 
 jobs:
   build-and-push:
@@ -19,6 +18,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      # FIX: Convert repository name to lowercase (AashishG7 -> aashishg7)
+      - name: Lowercase Image Name
+        run: |
+          echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
 
       - name: Log in to the Container registry
         uses: docker/login-action@v3
@@ -46,20 +50,26 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+      # FIX: We must calculate the lowercase name again for this new job
+      - name: Lowercase Image Name
+        run: |
+          echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+
       - name: Deploy to Alpine via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.ALPINE_HOST }}
           username: ${{ secrets.ALPINE_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          # port: ${{ secrets.SERVER_PORT }}  <-- UNCOMMENT THIS IF USING NGROK/PINGGY
           script: |
             # Login to GitHub Registry inside the Alpine Server
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             
-            # Pull the new image
+            # Pull the new image (using the lowercase var)
             docker pull ghcr.io/${{ env.IMAGE_NAME }}:main
             
-            # Stop and remove the old container (if it exists) || true prevents failure if it doesn't exist
+            # Stop and remove the old container
             docker stop react-app || true
             docker rm react-app || true
             
@@ -70,5 +80,5 @@ jobs:
               -p 80:80 \
               ghcr.io/${{ env.IMAGE_NAME }}:main
               
-            # Cleanup unused images to save space on Alpine
+            # Cleanup unused images
             docker image prune -f
